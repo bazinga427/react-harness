@@ -1,8 +1,11 @@
-from tools.calculate import calculator
+from tools.calculate import Calculator
+from tools.search import Search
 from core.llm import HelloAgentsLLM
 from agents.react_agent import *
-from tools.search import *
+# from tools.search import *
 from tools.registry import  ToolRegistry
+
+
 
 # --- 客户端使用示例 ---
 if __name__ == '__main__':
@@ -13,14 +16,10 @@ if __name__ == '__main__':
     # 2. 创建工具执行器，注册工具
     tool_registry = ToolRegistry()
     tool_registry.registerTool(
-        name="search",
-        description="一个网页搜索引擎，输入查询关键词，返回搜索结果摘要。",
-        func=search
+        Calculator()
     )
     tool_registry.registerTool(
-        name="calculator",
-        description="一个计算器工具，输入数学表达式（如 '2 + 3 * 4'），返回计算结果。",
-        func=calculator
+        Search()
     )
     # 3. 创建 ReAct Agent
     agent = ReActAgent(
@@ -34,6 +33,6 @@ if __name__ == '__main__':
     )
 
     # 4. 运行
-    question = "南昌今天的天气怎么样？转华氏度呢"
+    question = "帮我算一下 123456789 * 987654321 等于多少？"
     result = agent.run(question)
     print("最终返回:", result)

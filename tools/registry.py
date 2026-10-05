@@ -1,5 +1,5 @@
 from typing import Dict, Any
-from tool import *
+from tools.tool import *
 # 构建一个通用的工具(支持Tool对象)
 class ToolRegistry:
     """

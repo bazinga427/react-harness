@@ -1,6 +1,6 @@
 from abc import ABC, abstractmethod
 from typing import List,Dict,Any,Optional
-from ToolParameter import *
+from tools.ToolParameter import *
 
 class Tool(ABC):
     # ABC:abstract base class(抽象基类),自己不能被实例化，只能被继承

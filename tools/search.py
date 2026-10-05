@@ -1,7 +1,6 @@
 from serpapi import SerpApiClient
-from dotenv import load_dotenv
-load_dotenv()   # 这行必须放在 import os 之后、用 os.getenv 之前
-import os
+from tools.tool import *
+from core.config import Config
 
 def search(query: str) -> str:
     """
@@ -11,7 +10,7 @@ def search(query: str) -> str:
     print(f" 正在执行 [SerpApi] 网页搜索: {query}")
     try:
 
-        api_key = os.getenv("SERPAPI_API_KEY")
+        api_key = Config.from_env().serpapi_api_key
         if not api_key:
             return "错误:SERPAPI_API_KEY 未在 .env 文件中配置。"
 
@@ -45,3 +44,26 @@ def search(query: str) -> str:
 
     except Exception as e:
         return f"搜索时发生错误: {e}"
+
+
+class Search(Tool):
+   def __init__(self):
+       super().__init__(
+           name="search",
+           description="do some search"
+       )
+   def run(self,parameters: Dict[str, Any]) -> str:
+       query=parameters["query"]
+       return search(query)
+   def get_parameters(self) -> List[ToolParameter]:
+       return [
+           ToolParameter(
+               name="query",
+               type="str",
+               description="要搜索的问题",
+               required=True
+           )
+       ]
+
+# sea=Search()
+# print(sea.run({"query": "姚明的妻子是谁"}))

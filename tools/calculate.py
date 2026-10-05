@@ -1,7 +1,5 @@
-from dotenv import load_dotenv
-load_dotenv()
-import os
-from tools.registry import ToolRegistry
+from tools.tool import *
+
 def calculator(expression: str) -> str:
     """
     一个简单的计算器工具，输入数学表达式（如 '2 + 3 * 4'），返回计算结果。
@@ -13,15 +11,24 @@ def calculator(expression: str) -> str:
         return f"计算结果: {expression} = {result}"
     except Exception as e:
         return f"计算错误: {e}"
-# # 构造工具
-# tool = ToolExecutor()
-# tool_description="一个简单的计算器工具，输入数学表达式（如 '2 + 3 * 4'），返回计算结果"
-# tool.registerTool("calculator",tool_description,calculator)
-# # print(tool.getAvailableTools())
-# # 调用
-# str="2 + 3 * 4"
-# func=tool.getTool("calculator")
-# if func:
-#     print(func(str))
-# else:
-#     print(f"没有该工具")
+
+class Calculator(Tool):
+    def __init__(self):
+        super().__init__(name="calculator",description="do some math")
+    def run(self,parameters: Dict[str, Any]) -> str:
+        expression = parameters["expression"]
+        return calculator(expression)
+    def get_parameters(self) -> List[ToolParameter]:
+        return [
+            ToolParameter(
+                name="expression",
+                type="str",
+                description="要计算的数学表达式",
+                required=True
+            )
+        ]
+
+
+# cal=Calculator()
+# print(cal.get_parameters())
+# cal.run({"expression":"2 + 3 * 4"})

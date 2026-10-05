@@ -1,3 +1,4 @@
+# gitignore:哪些不要存档
 # Python 缓存
 __pycache__/
 *.pyc

@@ -91,7 +91,8 @@ class ReActAgent(Agent):
             if not tool_function:
                 observation = f"错误:未找到名为 '{tool_name}' 的工具。"
             else:
-                observation = tool_function(tool_input)  # 调用真实工具
+                params = {p.name: tool_input for p in tool_function.get_parameters()}
+                observation = tool_function.run(params)
                 # (这段逻辑紧随工具调用之后，在 while 循环的末尾)
                 print(f" 观察: {observation}")
 

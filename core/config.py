@@ -26,6 +26,7 @@ class Config(BaseModel):
     llm_api_key: Optional[str] = None
     llm_base_url: Optional[str] = None
     llm_model_id: Optional[str] = None
+    serpapi_api_key: Optional[str] = None
 
     # 系统配置
     debug: bool = False
@@ -45,6 +46,7 @@ class Config(BaseModel):
             llm_api_key=os.getenv("LLM_API_KEY"),
             llm_base_url=os.getenv("LLM_BASE_URL"),
             llm_model_id=os.getenv("LLM_MODEL_ID"),
+            serpapi_api_key=os.getenv("SERPAPI_API_KEY")
        )
 
     def to_dict(self) -> Dict[str, Any]:
