@@ -53,7 +53,7 @@ class Search(Tool):
            description="do some search"
        )
    def run(self,parameters: Dict[str, Any]) -> str:
-       query=parameters["query"]
+       query=parameters["query"] # 从参数列表中取出键名为query的字典
        return search(query)
    def get_parameters(self) -> List[ToolParameter]:
        return [

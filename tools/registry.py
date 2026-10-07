@@ -1,5 +1,6 @@
 from typing import Dict, Any
 from tools.tool import *
+from tools.Memory import *
 # 构建一个通用的工具(支持Tool对象)
 class ToolRegistry:
     """
@@ -27,11 +28,10 @@ class ToolRegistry:
 
     def execute(self, name: str, parameters: dict) -> str:
         """执行某个工具"""
-        tool = self.get(name)
+        tool = self.getTool(name)
         if tool is None:
             return f"错误：未找到工具 '{name}'"
         return tool.run(parameters)
-
     def getAvailableTools(self) -> str:
         """
         获取所有可用工具的格式化描述字符串。
@@ -40,3 +40,7 @@ class ToolRegistry:
             f"- {tool.name}: {tool.description}"
             for tool in self.tools.values()
         ])
+# toolregistry = ToolRegistry()
+# wm=WorkingMemory()
+# mem=Memory_tool(wm)
+# toolregistry.registerTool(mem)

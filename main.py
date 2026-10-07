@@ -1,5 +1,6 @@
 from tools.calculate import Calculator
 from tools.search import Search
+from tools.Memory import *
 from core.llm import HelloAgentsLLM
 from agents.react_agent import *
 # from tools.search import *
@@ -21,6 +22,12 @@ if __name__ == '__main__':
     tool_registry.registerTool(
         Search()
     )
+
+    wm = WorkingMemory()
+    wm.add(MemoryItem(content="我正在找python方向实习"))
+    wm.add(MemoryItem(content="我是大二软件工程专业学生"))
+    mem=Memory_tool(wm)
+    tool_registry.registerTool(mem)
     # 3. 创建 ReAct Agent
     agent = ReActAgent(
         name="ReActAgent",
@@ -33,6 +40,6 @@ if __name__ == '__main__':
     )
 
     # 4. 运行
-    question = "帮我算一下 123456789 * 987654321 等于多少？"
+    question = "我是什么专业的学生，在找什么方向的实习"
     result = agent.run(question)
     print("最终返回:", result)
