@@ -43,9 +43,9 @@
 - [Y] MemoryItem
 - [Y] WorkingMemory（add/remove/clear/retrieve）
 - [Y] MemoryTool 封装
-- [ ] 简化版 RAG（关键词检索，不碰向量）
-- [ ] RAGTool 封装
-- [ ] 两个 Tool 挂到 ReActAgent 上跑通
+- [Y] 简化版 RAG（关键词检索，不碰向量）
+- [Y] RAGTool 封装
+- [Y] 两个 Tool 挂到 ReActAgent 上跑通
 
 ## 暂不学（大三再补）
 
@@ -57,9 +57,8 @@
 
 ### 阶段 2 · RAG 系统（对应 8.3）
 
-- [ ] 文档读取 + 分块（chunk）
-- [ ] 本地向量化（先 TF-IDF，免费不调 API）
-- [ ] 简单向量存储 + 相似度检索
+- [Y] 文档读取 + 分块（chunk）
+- [Y] 简单向量存储 + 相似度检索BM25
 - [ ] RAGTool：add_text / search / stats
 - [ ] 检索结果拼进提示词，交给 LLM 生成答案
 
@@ -69,12 +68,6 @@
 - [ ] 做成"文档问答助手"
 - [ ] 用 FastAPI 包一层，暴露 `/ask` 接口（从脚本升级成服务）
 
-### 阶段 4 · 进阶对照（对应 8.3.5 与 8.5 习题）
-
-- [ ] MQE（多查询扩展）/ HyDE（假设文档嵌入）
-- [ ] 把 TF-IDF 换成真向量库（chromadb）+ 真嵌入模型
-- [ ] 对照官方实现：GitHub 上读 `hello_agents/memory/` 的源码
-- [ ] 可选：conda 建 Python 3.11 环境，装 `hello-agents[all]`，跑通书里 11 个 demo
 
 ## 六、第八章之后的计划
 
@@ -84,7 +77,6 @@
    和第八章的记忆/RAG 直接衔接，能让项目的回答质量明显上一个台阶。
 2. **第十二章 智能体性能评估**——直接给项目提供"指标"，
    是"玩具"和"作品"的分水岭。
-
 3. 开始着手做项目（非toy demo)
 
 ## 七、时间线

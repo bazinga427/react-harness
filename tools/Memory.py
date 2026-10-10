@@ -1,7 +1,3 @@
-from multiprocessing import resource_sharer
-
-from joblib import Memory
-
 from memory.working import *
 from tools.tool import *
 

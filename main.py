@@ -1,6 +1,7 @@
 from tools.calculate import Calculator
 from tools.search import Search
 from tools.Memory import *
+from tools.Rag import *
 from core.llm import HelloAgentsLLM
 from agents.react_agent import *
 # from tools.search import *
@@ -19,15 +20,19 @@ if __name__ == '__main__':
     tool_registry.registerTool(
         Calculator()
     )
-    tool_registry.registerTool(
-        Search()
-    )
+    # tool_registry.registerTool(
+    #     Search()
+    # )
 
     wm = WorkingMemory()
     wm.add(MemoryItem(content="我正在找python方向实习"))
     wm.add(MemoryItem(content="我是大二软件工程专业学生"))
     mem=Memory_tool(wm)
     tool_registry.registerTool(mem)
+
+    chunk = chunk_file("text.txt")
+    retriever=Retriever(chunk)
+    tool_registry.registerTool(rag_tool(retriever))
     # 3. 创建 ReAct Agent
     agent = ReActAgent(
         name="ReActAgent",
@@ -40,6 +45,6 @@ if __name__ == '__main__':
     )
 
     # 4. 运行
-    question = "我是什么专业的学生，在找什么方向的实习"
+    question = "公司一定要给我交社会保险费吗，请根据知识库找到对应的法条，并返回具体的法条"
     result = agent.run(question)
     print("最终返回:", result)
