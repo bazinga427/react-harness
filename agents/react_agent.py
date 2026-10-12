@@ -20,9 +20,14 @@ Action: 你决定采取的行动，必须是以下格式之一:
 - `Finish[最终答案]`:当你认为已经获得最终答案时。
 - 当你收集到足够的信息，能够回答用户的最终问题时，你必须在Action:字段后使用 Finish[最终答案] 来输出最终答案。
 
-现在，请开始解决以下问题:
+
+以下是已完成的步骤，仅供你参考，不要重复输出:
+{history}
+
+现在轮到你。请只输出一段 Thought 和一行 Action，输出后立即停止。
+不要输出 Observation，不要复述历史。
+如果历史中的信息已经足以回答，直接输出 Finish[最终答案]。
 Question: {question}
-History: {history}
 """
 
 class ReActAgent(Agent):
@@ -76,7 +81,7 @@ class ReActAgent(Agent):
             # 4. 执行Action
             if action.startswith("Finish"):
                 # 如果是Finish指令，提取最终答案并结束
-                final_answer = re.match(r"Finish\[(.*)\]", action).group(1)
+                final_answer = re.match(r"Finish\[(.*)\]", action,re.DOTALL).group(1)
                 print(f"最终答案: {final_answer}")
                 return final_answer
 
@@ -112,6 +117,7 @@ class ReActAgent(Agent):
             thought_match = re.search(r"Thought:\s*(.*?)(?=\nAction:|$)", text, re.DOTALL)
             # Action: 匹配到文本末尾
             action_match = re.search(r"Action:\s*(.*?)$", text, re.DOTALL)
+            # .strip() 去掉字符串首尾的空白字符
             thought = thought_match.group(1).strip() if thought_match else None
             action = action_match.group(1).strip() if action_match else None
             return thought, action

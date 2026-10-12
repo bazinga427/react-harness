@@ -1,0 +1,25 @@
+## Agent Loop 坑：LLM 自己续写整场对话
+
+现象：
+- 日志里出现几十轮重复的 user: Observation: / assistant: Action:，
+  且 Observation 是模型自己编的。
+- 输出被 Ctrl+C 打断，而非跑到 max_steps 结束。
+
+根因：
+- prompt 末尾是 "user: Observation: ..."，LLM 是续写引擎，
+  把整份 prompt 当成"一份未完成的对话"，本能地接着续写。
+- 于是它写完 Action，还继续编 Observation、编下一轮 Action，
+  一次生成里演完整场戏。
+
+修法（改 prompt 结构）：
+- history 贴上"只读、勿复述"标签；
+- 明确"本轮只输出一条 Action 后停"；
+- 明确"信息够了就 Finish"。
+
+验证信号：
+- 模型输出只有一段 Thought + 一行 Action，不再续写；
+- 终端不再出现模型生成的 user: Observation:。
+
+教训：
+- LLM 不会主动区分"历史"和"本轮指令"，边界必须由 prompt 结构明确给出。
+- 这是"上下文工程（Context Engineering）"的核心问题。
