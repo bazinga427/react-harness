@@ -6,8 +6,9 @@ from tools.registry import ToolRegistry
 from agents.base import Agent
 
 # ReAct 提示词模板
-REACT_PROMPT_TEMPLATE = """
-请注意，你是一个有能力调用外部工具的智能助手。
+
+# 静态
+SYSTEM_CONTENT="""请注意，你是一个有能力调用外部工具的智能助手。
 当前日期:{current_date}
 可用工具如下:
 {tools}
@@ -19,28 +20,30 @@ Action: 你决定采取的行动，必须是以下格式之一:
 - `{{tool_name}}[{{tool_input}}]`:调用一个可用工具。
 - `Finish[最终答案]`:当你认为已经获得最终答案时。
 - 当你收集到足够的信息，能够回答用户的最终问题时，你必须在Action:字段后使用 Finish[最终答案] 来输出最终答案。
+"""
 
-
-以下是已完成的步骤，仅供你参考，不要重复输出:
+# 动态（加到上下文窗口）
+USER_CONTENT="""以下是已完成的步骤，仅供你参考，不要重复输出:
 {history}
 
 现在轮到你。请只输出一段 Thought 和一行 Action，输出后立即停止。
 不要输出 Observation，不要复述历史。
 如果历史中的信息已经足以回答，直接输出 Finish[最终答案]。
-Question: {question}
-"""
+Question: {question}"""
 
 class ReActAgent(Agent):
-    def __init__(self, name, llm, tool_registry, max_steps=5, system_prompt=None):
+    def __init__(self, name, llm, tool_registry, max_steps=5, system_prompt=None,recent_move=None):
         super().__init__(name=name, llm=llm, system_prompt=system_prompt)
         self.tool_registry = tool_registry
         self.max_steps = max_steps
+        self.recent_move = []
 
     def run(self, question: str):
         """
         运行 ReAct 智能体来回答一个问题。
         """
         # self.history = []  # 每次运行时重置历史记录
+        self.recent_move = []  # 每次新问题，清空记录
         current_step = 0
 
         while current_step < self.max_steps:
@@ -50,15 +53,22 @@ class ReActAgent(Agent):
             # 1. 格式化提示词
             tools_desc = self.tool_registry.getAvailableTools()
             history_str = "\n".join([f"{m.role}: {m.content}" for m in self._history])
-            prompt = REACT_PROMPT_TEMPLATE.format(
+            system_content = SYSTEM_CONTENT.format(
                 tools=tools_desc,
-                question=question,
-                history=history_str,
                 current_date = datetime.now().strftime("%Y-%m-%d")
+            )
+            user_content = USER_CONTENT.format(
+                question=question,
+                history=history_str
             )
 
             # 2. 调用LLM进行思考
-            messages = [{"role": "user", "content": prompt}]
+
+            messages = [
+                {"role": "system", "content": system_content},
+                {"role": "user", "content": user_content},
+            ]
+            # print(f"提示词:{messages}")
             # 【本次修改 3】原来的写法是 self.llm_client，可是这个属性根本不存在：
             # 基类 Agent 里保存大模型客户端用的是 self.llm（见 agents/base.py 里 self.llm = llm 那一行），
             # 所以这里必须写成 self.llm。之前即使前面两个错误都修好，走到这一步也会报
@@ -96,14 +106,31 @@ class ReActAgent(Agent):
             if not tool_function:
                 observation = f"错误:未找到名为 '{tool_name}' 的工具。"
             else:
-                params = {p.name: tool_input for p in tool_function.get_parameters()}
+                self.recent_move.append([tool_name, tool_input])
+                # 检测是否重复
+
+                if len(self.recent_move) >= 2:
+                    last_action = self.recent_move[-1]
+                    previous_action = self.recent_move[-2]
+                    if (last_action[0]==previous_action[0]):
+                        print("重复")
+                        observation = "你已经重复调用过这个工具了，检索结果没有新增信息。请基于现有信息直接输出 Finish[最终答案]。"
+                        self._history.append(Message(content=f"Action: {action}", role="assistant"))
+                        self._history.append(Message(
+                            content=f"Observation: {observation}", role="user"))
+                        continue
+
+            params = {p.name: tool_input for p in tool_function.get_parameters()}
+            try:
                 observation = tool_function.run(params)
                 # (这段逻辑紧随工具调用之后，在 while 循环的末尾)
                 print(f" 观察: {observation}")
+            except Exception as e:
+                observation=f"工具{tool_name}执行失败：{type(e).__name__}:{e}"
 
-                # 将本轮的Action和Observation添加到历史记录中
-                self._history.append(Message(content=f"Action: {action}", role="assistant"))
-                self._history.append(Message(content=f"Observation: {observation}", role="user"))
+             # 将本轮的Action和Observation添加到历史记录中
+            self._history.append(Message(content=f"Action: {action}", role="assistant"))
+            self._history.append(Message(content=f"Observation: {observation}", role="user"))
 
                 # 循环结束
         print("已达到最大步数，流程终止。")

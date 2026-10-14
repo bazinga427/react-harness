@@ -10,7 +10,7 @@ def calculator(expression: str) -> str:
         result = eval(expression)
         return f"计算结果: {expression} = {result}"
     except Exception as e:
-        return f"计算错误: {e}"
+        return f"计算错误: {type(e).__name__}:{e}"
 
 class Calculator(Tool):
     def __init__(self):
@@ -31,4 +31,5 @@ class Calculator(Tool):
 
 # cal=Calculator()
 # print(cal.get_parameters())
-# cal.run({"expression":"2 + 3 * 4"})
+# result=cal.run({"expression":"5/0"})
+# print(result)

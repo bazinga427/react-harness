@@ -41,7 +41,7 @@ if __name__ == '__main__':
         # 名字对不上，Python 会直接报 TypeError: __init__() got an unexpected keyword argument。
         llm=llm_client,
         tool_registry=tool_registry,
-        max_steps=5
+        max_steps=4
     )
 
     # 4. 运行
